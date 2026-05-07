@@ -352,6 +352,8 @@ function SidebarUsageFooter({
 						FREE
 					</Badge>
 				</Link>
+				{/* Buy More hidden - self-hosted without Stripe */}
+				{false && (
 				<Link
 					href={`/dashboard/${searchSpaceId}/buy-more`}
 					className="group flex w-full items-center justify-between rounded-md px-1.5 py-1 transition-colors hover:bg-accent"
@@ -364,6 +366,7 @@ function SidebarUsageFooter({
 						$1/1k &middot; $1/1M
 					</span>
 				</Link>
+				)}
 			</div>
 		</div>
 	);
