@@ -8,8 +8,8 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install pnpm
-RUN corepack enable pnpm
+# Install pnpm v9 (v10+ requires explicit build script approval)
+RUN corepack enable pnpm && corepack prepare pnpm@9.15.9 --activate
 
 # Copy package files
 COPY package.json pnpm-lock.yaml* .npmrc* ./
@@ -19,17 +19,15 @@ COPY source.config.ts ./
 COPY content ./content
 
 # Install dependencies with frozen lockfile
-# pnpm v10+ requires explicit approval for build scripts
-RUN pnpm config set --location=project onlyBuiltDependencies '["@parcel/watcher","@rocicorp/zero-sqlite3","@swc/core","core-js","esbuild","protobufjs","sharp","unrs-resolver"]' && \
-    pnpm i --frozen-lockfile
+RUN pnpm i --frozen-lockfile
 
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 
-# Enable pnpm
-RUN corepack enable pnpm
+# Enable pnpm v9
+RUN corepack enable pnpm && corepack prepare pnpm@9.15.9 --activate
 
 # Build with placeholder values for NEXT_PUBLIC_* variables.
 # These are replaced at container startup by docker-entrypoint.js
