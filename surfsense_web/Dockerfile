@@ -19,7 +19,9 @@ COPY source.config.ts ./
 COPY content ./content
 
 # Install dependencies with frozen lockfile
-RUN pnpm i --frozen-lockfile
+# pnpm v10+ requires explicit approval for build scripts
+RUN pnpm config set --location=project onlyBuiltDependencies '["@parcel/watcher","@rocicorp/zero-sqlite3","@swc/core","core-js","esbuild","protobufjs","sharp","unrs-resolver"]' && \
+    pnpm i --frozen-lockfile
 
 
 # Rebuild the source code only when needed
