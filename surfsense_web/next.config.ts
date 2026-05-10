@@ -11,6 +11,35 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 // ships what desktop users actually need.
 const nextConfig: NextConfig = {
 	output: "standalone",
+
+	// Prevent stale HTML cache after redeploy
+	// Static assets (/_next/static/*) keep content-hash based caching
+	async headers() {
+		return [
+			{
+				source: "/:path*",
+				headers: [
+					{
+						key: "Cache-Control",
+						// max-age=0: browser always revalidates
+						// s-maxage=60: shared cache (CDN) holds 60s
+						// stale-while-revalidate=300: serve stale up to 5min during revalidation
+						value: "public, max-age=0, s-maxage=60, stale-while-revalidate=300, must-revalidate",
+					},
+				],
+			},
+			{
+				source: "/_next/static/:path*",
+				headers: [
+					{
+						key: "Cache-Control",
+						// Static assets have content hashes — cache aggressively
+						value: "public, max-age=31536000, immutable",
+					},
+				],
+			},
+		];
+	},
 	outputFileTracingRoot: path.join(__dirname, ".."),
 	reactStrictMode: false,
 	typescript: {
